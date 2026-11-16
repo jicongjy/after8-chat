@@ -31,7 +31,7 @@ npx firebase-tools login
 npx firebase-tools use --add
 npm run deploy
 ```
-7. 끝나면 `https://프로젝트ID.web.app` 주소가 나와요. 탭 4 → "관리자 로그인"으로 들어가 확인해요.
+7. 끝나면 `https://프로젝트ID.web.app` 주소가 나와요. 화면 오른쪽 위 "관리자 로그인"으로 들어가 확인해요.
 
 ## 지켜야 할 것
 - 보안 규칙(`firestore.rules`)이 "누가 읽고 쓰는지"를 정해요. 배포할 때 같이 올라가요.

@@ -16,8 +16,6 @@ if "</style" in fonts.lower():
     raise SystemExit("fonts.css 에 </style 이 들어 있어요.")
 rep = {
     "__FONTS__": fonts,
-    "__EV__": js(rd("content", "event-info.md")),
-    "__RU__": js(rd("content", "answer-rules.md")),
     "__EV4__": js(rd("content", "tab4-info.md")),
     "__RU4__": js(rd("content", "tab4-rules.md")),
 }
