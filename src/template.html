@@ -962,7 +962,7 @@ function renderRulesView(box) {
 $("aback").onclick = () => { adminOpen = false; render(); window.scrollTo(0, 0); };
 $("alogout").onclick = async () => { adminOpen = false; await fb.logout(); };
 $("adminbtn").onclick = () => {
-  if (fb && !owner) { wantAdmin = true; fb.login().catch(e => { wantAdmin = false; alert("로그인하지 못했어요."); }); return; }
+  if (fb && !owner) { wantAdmin = true; fb.login().then(() => setTimeout(() => { if (wantAdmin && !owner) { wantAdmin = false; alert("로그인은 됐지만 관리자로 확인되지 않았어요. Firestore의 admins 컬렉션에 로그인한 구글 이메일(소문자)을 문서 ID로 가진 문서가 있는지 확인해 주세요."); } }, 2500)).catch(e => { wantAdmin = false; alert("로그인하지 못했어요. (" + (e && e.code || "알 수 없는 오류") + ")"); }); return; }
   adminOpen = !adminOpen;
   if (adminOpen) { draft = clone(DATA); adminTab = "log"; adminMsg = ""; }
   render(); if (adminOpen) renderAdmin();
@@ -974,8 +974,9 @@ render();
 (async () => {
   if (fb) {
     try {
-      await fb.init(isA => {
+      await fb.init((isA, r) => {
         owner = isA;
+        if (!isA && r && r.email && wantAdmin) { wantAdmin = false; alert(r.err ? "관리자 확인 중 오류가 났어요(" + r.err + "). 잠시 뒤 다시 시도해 주세요." : r.email + " 계정은 관리자로 등록돼 있지 않아요. Firestore의 admins 컬렉션에 이 이메일을 문서 ID로 가진 문서가 있는지 확인해 주세요."); }
         if (isA && wantAdmin) { wantAdmin = false; adminOpen = true; draft = clone(DATA); adminTab = "log"; adminMsg = ""; }
         if (isA) fb.loadLogs().then(l => { LOG = l; if (adminOpen) renderAdmin(); render(); }).catch(() => {});
         else { LOG = LOG.filter(x => mineIds.has(x.id)); adminOpen = false; }

@@ -21,9 +21,11 @@
     if (!auth.currentUser && signing) await signing;
     return auth.currentUser;
   }
+  // 관리자인지 확인한다. 못 읽으면 이유를 함께 돌려준다(화면에 안내하려고).
   async function isAdmin(user) {
-    if (!user || user.isAnonymous || !user.email) return false;
-    try { return (await M.fs.getDoc(M.fs.doc(db, "admins", user.email))).exists(); } catch (e) { return false; }
+    if (!user || user.isAnonymous || !user.email) return { ok: false };
+    try { return { ok: (await M.fs.getDoc(M.fs.doc(db, "admins", user.email))).exists(), email: user.email }; }
+    catch (e) { return { ok: false, email: user.email, err: e && e.code }; }
   }
 
   window.SMC_FB = {
@@ -34,8 +36,8 @@
         let first = true;
         M.au.onAuthStateChanged(auth, async user => {
           if (!user) { signing = M.au.signInAnonymously(auth).catch(() => { if (first) { first = false; resolve(); } }); return; }
-          const a = await isAdmin(user);
-          if (a !== lastAdmin) { lastAdmin = a; if (cb) cb(a); }
+          const r = await isAdmin(user), a = r.ok;
+          if (a !== lastAdmin || (!a && r.email)) { lastAdmin = a; if (cb) cb(a, r); }
           if (first) { first = false; resolve(); }
         });
       });
