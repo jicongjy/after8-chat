@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node --env-file=.env server.mjs",
     "build:web": "node build-web.mjs",
-    "deploy": "node build-web.mjs && npx firebase-tools deploy --only hosting,firestore",
+    "deploy": "node build-web.mjs && npx firebase-tools deploy --only hosting,firestore,functions",
     "build": "python3 src/build.py"
   },
   "dependencies": {

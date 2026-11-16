@@ -1,0 +1,12 @@
+{
+  "name": "functions",
+  "private": true,
+  "description": "퇴근 후 8시 채팅 · AI 호출 함수. 클로드 키는 Secret Manager 비밀값으로만 읽는다.",
+  "main": "index.js",
+  "engines": { "node": "22" },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.8.0",
+    "firebase-admin": "^13.0.0",
+    "firebase-functions": "^6.0.0"
+  }
+}

@@ -635,10 +635,13 @@ async function callAI(prompt, opts, tabId) {
     if (!sample) throw { code: "unavailable" };
     return sample(prompt, opts);
   }
-  if (fb) throw { local: true, message: "이 배포 주소에는 AI 서버가 연결돼 있지 않아요(무료 요금제). 목록에 있는 질문은 그대로 답해요. AI 답변은 내 컴퓨터에서 npm start 로 확인해 주세요." };
   let res;
-  try { res = await fetch("/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt, tab: tabId }) }); }
-  catch (e) { throw { local: true, message: "AI 서버에 연결하지 못했어요. 터미널에서 npm start 로 서버를 켜고, 주소창이 http://localhost:… 인지 확인해 주세요." }; }
+  try {
+    const hd = { "Content-Type": "application/json" };
+    if (fb) hd.Authorization = "Bearer " + await fb.token();
+    res = await fetch("/api/chat", { method: "POST", headers: hd, body: JSON.stringify({ prompt, tab: tabId }) });
+  }
+  catch (e) { throw { local: true, message: fb ? "AI 서버에 연결하지 못했어요. 잠시 뒤에 다시 시도해 주세요." : "AI 서버에 연결하지 못했어요. 터미널에서 npm start 로 서버를 켜고, 주소창이 http://localhost:… 인지 확인해 주세요." }; }
   if (!res.ok) {
     let m = "AI 호출에 실패했어요."; try { m = (await res.json()).message || m; } catch (e) {}
     throw res.status === 429 ? { code: "rate_limited" } : { local: true, message: m };
@@ -730,7 +733,7 @@ async function ask(text) {
   const lv = live, start = performance.now(); let first = 0;
   const history = state[tabId].slice(1).map(m => (m.role === "me" ? "사용자: " : "도우미: ") + m.text).join("\n");
   const sys = t.rich ? t.system + "\n\n[스토어 데이터 · 기준일 " + DATA_DATE + "]\n" + storeText() : t.system;
-  const cg = ((window.claude && claude.use) || fb) ? ruleText(tabId) : { text: "", n: 0 };
+  const cg = (window.claude && claude.use) ? ruleText(tabId) : { text: "", n: 0 };
   const prompt = sys + (cg.text ? "\n\n" + cg.text : "") + "\n\n[지금까지의 대화]\n" + history + "\n\n위 대화에 이어 도우미의 다음 답만 써 줘. 앞에 '도우미:'는 붙이지 마.";
   try {
     const opts = { cache: false, modelTier: "quick" };

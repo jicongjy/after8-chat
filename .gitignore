@@ -7,3 +7,4 @@ data/
 public/
 web/firebase-config.js
 .firebase/
+functions/node_modules/

@@ -15,9 +15,9 @@ GitHub(소스) ─▶ 내 컴퓨터에서 npm run deploy ─▶ Firebase Hosting
 | 스토어 표(상품·재고·주문·배송) | 브라우저 | Firestore `store` |
 | 관리자 | 누구나 버튼 | 구글 로그인 + 관리자 명단(`admins`)에 있는 이메일만 |
 | 즉시 조회 답변 | 동작 | 동작 |
-| **AI 답변** | 서버가 키로 호출 | **동작 안 함** — 무료 요금제에는 서버(Functions)가 없어서 키를 안전하게 둘 곳이 없어요 |
+| **AI 답변** | 서버가 키로 호출 | Cloud Functions(`functions/index.js`)가 대신 호출. 키는 Secret Manager 비밀값에만 있고 화면에는 전달되지 않음. 로그인(익명 포함)한 사용자만 호출 가능 |
 
-AI 답변까지 배포하려면 Blaze 요금제 + Cloud Functions + 비밀값(Secret Manager)에 키를 보관해야 해요. 지금 구성에는 넣지 않았어요.
+AI 답변에는 Blaze 요금제가 필요해요(Functions·Secret Manager). 키는 `npx firebase-tools functions:secrets:set ANTHROPIC_API_KEY` 로 넣고, 바꿀 때도 같은 명령을 써요. 바꾼 뒤에는 `npm run deploy`로 함수를 다시 올려요.
 
 ## 순서
 1. **Firebase 프로젝트 만들기** (콘솔 → 프로젝트 추가 → Google 애널리틱스는 꺼도 돼요)

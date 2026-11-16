@@ -5,7 +5,7 @@
   const cfg = window.SMC_FIREBASE_CONFIG;
   if (!cfg) return;
   const B = "https://www.gstatic.com/firebasejs/11.0.2/";
-  let M = null, auth, db, cb = null, lastAdmin = null;
+  let M = null, auth, db, cb = null, lastAdmin = null, signing = null;
   const strip = o => JSON.parse(JSON.stringify(o));
 
   async function load() {
@@ -14,6 +14,12 @@
     const a = app.initializeApp(cfg);
     auth = au.getAuth(a); db = fs.getFirestore(a);
     return (M = { au, fs });
+  }
+  // 로그인(익명 포함)이 끝날 때까지 기다린 뒤 현재 사용자를 돌려준다.
+  async function me() {
+    await load(); await auth.authStateReady();
+    if (!auth.currentUser && signing) await signing;
+    return auth.currentUser;
   }
   async function isAdmin(user) {
     if (!user || user.isAnonymous || !user.email) return false;
@@ -27,21 +33,23 @@
       await new Promise(resolve => {
         let first = true;
         M.au.onAuthStateChanged(auth, async user => {
-          if (!user) { try { await M.au.signInAnonymously(auth); } catch (e) { if (first) { first = false; resolve(); } } return; }
+          if (!user) { signing = M.au.signInAnonymously(auth).catch(() => { if (first) { first = false; resolve(); } }); return; }
           const a = await isAdmin(user);
           if (a !== lastAdmin) { lastAdmin = a; if (cb) cb(a); }
           if (first) { first = false; resolve(); }
         });
       });
     },
+    async token() { const u = await me(); return u ? u.getIdToken() : ""; },
     login() { return M.au.signInWithPopup(auth, new M.au.GoogleAuthProvider()); },
     logout() { return M.au.signOut(auth); },
 
     // 대화 기록: create(처음 저장) / report(사용자 신고) / fb(관리자 피드백)
     async setLog(e, mode) {
+      const u = await me(); if (!u) return;
       const { fs } = M, ref = fs.doc(db, "chatlogs", e.id);
       try {
-        if (mode === "create") await fs.setDoc(ref, strip(Object.assign({}, e, { uid: auth.currentUser.uid })));
+        if (mode === "create") await fs.setDoc(ref, strip(Object.assign({}, e, { uid: u.uid })));
         else if (mode === "report") await fs.updateDoc(ref, strip({ report: e.report }));
         else await fs.updateDoc(ref, strip({ fb: e.fb, report: e.report }));
       } catch (err) { console.warn("대화 기록 저장 실패", err); throw err; }
