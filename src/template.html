@@ -170,6 +170,20 @@ __FONTS__
   .guide em { flex: none; font-style: normal; font-size: 0.7rem; padding: 2px 8px; border-radius: 999px; background: var(--soft); color: var(--sub); }
   .guide span { flex: 1; min-width: 0; }
   .guide i { font-style: normal; color: var(--ink); }
+  .hero-art { display: block; width: min(300px, 78%); height: auto; margin: 0 auto -4px; color: var(--ink); overflow: visible; }
+  .hero-art .a-soft { fill: var(--soft); } .hero-art .a-bg { fill: var(--bg); }
+  .hero-art .a-ln { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+  .hero-art .a-thin { fill: none; stroke: var(--sub); stroke-width: 1.6; stroke-linecap: round; }
+  .hero-art .a-fill { fill: currentColor; }
+  .hero-art .a-float { animation: bob 4.2s ease-in-out infinite; }
+  .hero-art .a-float.d2 { animation-duration: 5s; animation-delay: -1.6s; }
+  .hero-art .a-sec { transform-origin: 160px 78px; animation: sweep 14s linear infinite; }
+  .hero-art .a-tw { animation: twinkle 3s ease-in-out infinite; } .hero-art .a-tw.d2 { animation-delay: -1s; } .hero-art .a-tw.d3 { animation-delay: -2s; }
+  .hero-art .a-moon { animation: bob 6s ease-in-out infinite; animation-delay: -2s; }
+  @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+  @keyframes sweep { to { transform: rotate(360deg); } }
+  @keyframes twinkle { 0%, 100% { opacity: .15; } 50% { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .hero-art * { animation: none !important; } }
   .log.hero { justify-content: center; align-items: center; gap: 20px; }
   .hero-wrap { width: 100%; max-width: 560px; display: flex; flex-direction: column; gap: 18px; }
   .hero-t { text-align: center; display: grid; gap: 4px; }
@@ -514,8 +528,21 @@ function makeList(items) {
   });
   return d;
 }
+// 첫 화면 일러스트: 저녁 8시 시계, 뜨개 실뭉치, 노트와 연필, 달과 별. 색은 화면 색 변수를 따라서 어두운 화면에서도 맞는다.
+const HERO_ART = '<svg class="hero-art" viewBox="0 0 320 150" role="img" aria-label="저녁 8시를 가리키는 시계와 뜨개 실뭉치, 노트">'
+  + '<circle class="a-soft" cx="160" cy="78" r="66"/>'
+  + '<g class="a-moon"><path class="a-fill" d="M276 22a15 15 0 1 0 13 23a12 12 0 0 1-13-23z"/></g>'
+  + '<g class="a-fill"><path class="a-tw" d="M40 34v8M36 38h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="a-tw d2" d="M96 12v6M93 15h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="a-tw d3" d="M236 14v6M233 17h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></g>'
+  + '<circle class="a-bg a-ln" cx="160" cy="78" r="42"/>'
+  + '<path class="a-thin" d="M160 42v5M160 109v5M124 78h5M191 78h5"/>'
+  + '<path class="a-ln" d="M160 78V56"/><path class="a-ln" d="M160 78l-17 10"/>'
+  + '<g class="a-sec"><path class="a-thin" d="M160 82V50"/></g><circle class="a-fill" cx="160" cy="78" r="3.5"/>'
+  + '<g class="a-float"><circle class="a-bg a-ln" cx="62" cy="104" r="20"/><path class="a-thin" d="M46 96c10 6 22 6 32-2M44 106c12 6 24 6 36-2M50 117c9 3 19 3 26-2"/><path class="a-ln" d="M78 118c10 6 16 10 26 6"/></g>'
+  + '<g class="a-float d2"><g transform="rotate(8 256 100)"><rect class="a-bg a-ln" x="232" y="72" width="46" height="56" rx="7"/><path class="a-thin" d="M241 90h28M241 100h28M241 110h18"/></g><path class="a-ln" d="M284 70l-24 38l-3 9l9-3l24-38z" transform="translate(-4 4)"/></g>'
+  + '</svg>';
 function makeHero(t) {
   const d = document.createElement("div"); d.className = "hero-wrap";
+  d.insertAdjacentHTML("beforeend", HERO_ART);
   const h = document.createElement("div"); h.className = "hero-t";
   const b = document.createElement("b"); b.textContent = t.heroTitle; const sp = document.createElement("span"); sp.textContent = t.heroSub;
   h.append(b, sp); d.appendChild(h);
@@ -557,8 +584,8 @@ function render() {
     if (m.track) log.appendChild(makeTrack(m.track));
     if (m.list) log.appendChild(makeList(m.list));
     (m.cards || []).forEach(c => log.appendChild(makeCard(c)));
-    if (m.src) { const s = document.createElement("div"); s.className = "src"; s.textContent = "근거 · " + m.src; log.appendChild(s); }
-    if (m.meta) { const s = document.createElement("div"); s.className = "meta"; s.textContent = m.meta; log.appendChild(s); }
+    if (m.src) { const s = document.createElement("div"); s.className = "src"; s.textContent = "참고 · " + m.src; log.appendChild(s); }
+    if (m.meta && owner) { const s = document.createElement("div"); s.className = "meta"; s.textContent = m.meta; log.appendChild(s); } // 응답 시간 같은 측정값은 관리자에게만 보인다(대화 기록에는 계속 저장)
     if (m.logId && !m.err && t.mode !== "fake") log.appendChild(makeReport(m));
   });
   if (busy && busyTab === cur) {
