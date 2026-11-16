@@ -1,0 +1,38 @@
+# main에 올라오면 화면(Hosting)을 자동으로 배포한다.
+# 함수(functions)와 보안 규칙(firestore.rules)은 자동 배포되지 않는다. 바꿨을 때는 컴퓨터에서 npm run deploy 를 실행한다.
+name: Deploy to Firebase Hosting on merge
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: firebase-hosting-deploy
+  cancel-in-progress: false
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # web/firebase-config.js 는 깃에 올리지 않는 파일이라, 저장소 비밀값 FIREBASE_WEB_CONFIG 의 내용으로 만든다.
+      - name: 화면 설정 파일 만들기
+        env:
+          FIREBASE_WEB_CONFIG: ${{ secrets.FIREBASE_WEB_CONFIG }}
+        run: |
+          if [ -z "$FIREBASE_WEB_CONFIG" ]; then
+            echo "::error::저장소 비밀값 FIREBASE_WEB_CONFIG 가 비어 있어요. Settings > Secrets and variables > Actions 에서 web/firebase-config.js 내용을 넣어 주세요."
+            exit 1
+          fi
+          printf '%s\n' "$FIREBASE_WEB_CONFIG" > web/firebase-config.js
+
+      - run: npm ci && npm run build:web
+
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_SELECTMARKET_CHAT_8PM }}
+          channelId: live
+          projectId: selectmarket-chat-8pm
