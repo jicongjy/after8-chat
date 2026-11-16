@@ -18,16 +18,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # web/firebase-config.js 는 깃에 올리지 않는 파일이라, 저장소 비밀값 FIREBASE_WEB_CONFIG 의 내용으로 만든다.
+      # web/firebase-config.js 는 깃에 올리지 않는 파일이다. Firebase Hosting 이 공개로 제공하는 설정 주소에서 받아 만든다.
+      # (손으로 붙여 넣은 비밀값은 예시 글자가 섞여 서비스가 깨진 적이 있어서 쓰지 않는다)
       - name: 화면 설정 파일 만들기
-        env:
-          FIREBASE_WEB_CONFIG: ${{ secrets.FIREBASE_WEB_CONFIG }}
         run: |
-          if [ -z "$FIREBASE_WEB_CONFIG" ]; then
-            echo "::error::저장소 비밀값 FIREBASE_WEB_CONFIG 가 비어 있어요. Settings > Secrets and variables > Actions 에서 web/firebase-config.js 내용을 넣어 주세요."
-            exit 1
-          fi
-          printf '%s\n' "$FIREBASE_WEB_CONFIG" > web/firebase-config.js
+          curl -fsS --retry 3 https://selectmarket-chat-8pm-c09df.web.app/__/firebase/init.json -o /tmp/init.json
+          printf 'window.SMC_FIREBASE_CONFIG = %s;\n' "$(cat /tmp/init.json)" > web/firebase-config.js
+          # 값이 진짜인지 확인한다: 프로젝트가 맞고, 예시 글자(...)가 없고, 키 모양이 맞아야 한다.
+          grep -q '"projectId": "selectmarket-chat-8pm"' web/firebase-config.js || { echo "::error::설정의 프로젝트 ID가 selectmarket-chat-8pm 이 아니에요."; exit 1; }
+          grep -q '\.\.\.' web/firebase-config.js && { echo "::error::설정에 예시 글자(...)가 들어 있어요."; exit 1; }
+          grep -Eq '"apiKey": "AIza[0-9A-Za-z_-]{30,}"' web/firebase-config.js || { echo "::error::apiKey 모양이 올바르지 않아요."; exit 1; }
+          node -e "new Function(require('fs').readFileSync('web/firebase-config.js','utf8'))" || { echo "::error::설정 파일 문법이 올바르지 않아요."; exit 1; }
 
       - run: npm ci && npm run build:web
 
