@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch: # 깃허브 Actions 화면의 "Run workflow" 버튼으로 직접 실행할 수 있게 한다
 
 concurrency:
   group: firebase-hosting-deploy
