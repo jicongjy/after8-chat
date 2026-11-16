@@ -1,4 +1,4 @@
-// 셀렉트마켓 채팅 · 내 컴퓨터용 AI 서버
+// 퇴근 후 8시 채팅 · 내 컴퓨터용 AI 서버
 // - 키는 .env 의 ANTHROPIC_API_KEY 에서만 읽고, 브라우저로는 절대 보내지 않는다.
 // - 이 컴퓨터(127.0.0.1)에서만 열린다.
 // 실행: 이 폴더에서  npm start
@@ -134,6 +134,6 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, "127.0.0.1", () => {
-  console.log(`\n셀렉트마켓 채팅 서버가 켜졌어요 → http://localhost:${PORT}`);
+  console.log(`\n퇴근 후 8시 채팅 서버가 켜졌어요 → http://localhost:${PORT}`);
   console.log(client ? `AI 모델: ${MODEL}` : "⚠ API 키가 비어 있어요. 프로젝트 폴더의 .env 에 ANTHROPIC_API_KEY 를 넣고 다시 켜 주세요.");
 });

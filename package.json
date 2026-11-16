@@ -1,8 +1,8 @@
 {
-  "name": "selectmarket-chat",
+  "name": "after8-chat",
   "private": true,
   "type": "module",
-  "description": "셀렉트마켓 채팅 실습용 로컬 서버. 키는 .env 에서만 읽는다.",
+  "description": "퇴근 후 8시 채팅 실습용 로컬 서버. 키는 .env 에서만 읽는다.",
   "scripts": {
     "start": "node --env-file=.env server.mjs",
     "build:web": "node build-web.mjs",
