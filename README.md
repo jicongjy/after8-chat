@@ -8,16 +8,16 @@
 ```
 
 ## 처음 한 번
-1. 프로젝트 맨 위 폴더의 `.env` 파일에 `ANTHROPIC_API_KEY=` 뒤로 공유받은 키를 붙여 넣어요. (없으면 `selectmarket-chat/env.example`을 `.env`로 복사)
+1. 이 폴더의 `.env` 파일에 `ANTHROPIC_API_KEY=` 뒤로 공유받은 키를 붙여 넣어요. (없으면 `env.example`을 `.env`로 복사)
 2. 터미널에서 설치해요.
 
 ```bash
-cd selectmarket-chat && npm install
+npm install
 ```
 
 ## 켜기
 ```bash
-cd selectmarket-chat && npm start
+npm start
 ```
 브라우저에서 http://localhost:8787 을 열어요. 끄려면 터미널에서 `Ctrl + C`.
 

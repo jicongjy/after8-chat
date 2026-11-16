@@ -1,7 +1,7 @@
 // 셀렉트마켓 채팅 · 내 컴퓨터용 AI 서버
-// - 키는 ../.env 의 ANTHROPIC_API_KEY 에서만 읽고, 브라우저로는 절대 보내지 않는다.
+// - 키는 .env 의 ANTHROPIC_API_KEY 에서만 읽고, 브라우저로는 절대 보내지 않는다.
 // - 이 컴퓨터(127.0.0.1)에서만 열린다.
-// 실행: selectmarket-chat 폴더에서  npm start
+// 실행: 이 폴더에서  npm start
 import http from "node:http";
 import { readFile, writeFile, mkdir, rename } from "node:fs/promises";
 import { fileURLToPath } from "node:url";

@@ -27,7 +27,6 @@ AI 답변까지 배포하려면 Blaze 요금제 + Cloud Functions + 비밀값(Se
 5. **관리자 등록**: Firestore에서 컬렉션 `admins`를 만들고, 문서 ID를 **내 구글 이메일**로 해서 필드 하나(예: `role` = `owner`)를 넣어요.
 6. 터미널에서:
 ```bash
-cd selectmarket-chat
 npx firebase-tools login
 npx firebase-tools use --add
 npm run deploy
