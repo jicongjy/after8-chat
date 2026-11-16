@@ -5,14 +5,23 @@ import json, os
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 rd = lambda *p: open(os.path.join(ROOT, *p), encoding="utf8").read()
 html = rd("src", "template.html")
+import re
+
+def js(text):
+    # <script> 안에 넣을 문자열: '</script>' 같은 글이 들어 있어도 태그가 닫히지 않게 '<'를 이스케이프한다.
+    return json.dumps(text, ensure_ascii=False).replace("<", "\\u003c").replace("\u2028", "\\u2028").replace("\u2029", "\\u2029")
+
+fonts = rd("src", "fonts.css")
+if "</style" in fonts.lower():
+    raise SystemExit("fonts.css 에 </style 이 들어 있어요.")
 rep = {
-    "__FONTS__": rd("src", "fonts.css"),
-    "__EV__": json.dumps(rd("content", "event-info.md"), ensure_ascii=False),
-    "__RU__": json.dumps(rd("content", "answer-rules.md"), ensure_ascii=False),
-    "__EV4__": json.dumps(rd("content", "tab4-info.md"), ensure_ascii=False),
-    "__RU4__": json.dumps(rd("content", "tab4-rules.md"), ensure_ascii=False),
+    "__FONTS__": fonts,
+    "__EV__": js(rd("content", "event-info.md")),
+    "__RU__": js(rd("content", "answer-rules.md")),
+    "__EV4__": js(rd("content", "tab4-info.md")),
+    "__RU4__": js(rd("content", "tab4-rules.md")),
 }
-for k, v in rep.items():
-    html = html.replace(k, v)
+# 한 번에 바꿔서, 끼워 넣은 글 안의 __XX__ 가 다시 바뀌지 않게 한다.
+html = re.sub("|".join(map(re.escape, rep)), lambda m: rep[m.group(0)], html)
 open(os.path.join(ROOT, "web", "index.html"), "w", encoding="utf8").write(html)
 print("web/index.html 을 만들었어요.")
