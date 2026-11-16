@@ -7,6 +7,17 @@
               ◀──답──            ◀──답──
 ```
 
+## 폴더 구성
+```
+src/        화면 원본(template.html), 글꼴(fonts.css), 합치는 스크립트(build.py)
+content/    챗봇이 읽는 글: 이벤트 안내·스토어 데이터·답변 규칙(.md 4개)
+web/        합쳐진 화면(index.html) + Firebase 연결(firebase-adapter.js)
+docs/       기획서·테스트 보고서·리서치·플로우차트와 단독 실행 파일
+server.mjs  내 컴퓨터용 AI 서버 (키는 .env에서만 읽음)
+firebase.json · firestore.rules · build-web.mjs   Firebase 배포 설정
+```
+화면을 고친 뒤에는 `python3 src/build.py`(또는 `npm run build`)로 `web/index.html`을 다시 만들어요.
+
 ## 처음 한 번
 1. 이 폴더의 `.env` 파일에 `ANTHROPIC_API_KEY=` 뒤로 공유받은 키를 붙여 넣어요. (없으면 `env.example`을 `.env`로 복사)
 2. 터미널에서 설치해요.
@@ -60,4 +71,4 @@ npm start
 ## 지켜야 할 것
 - `.env`는 깃에 올라가지 않아요. 메신저·메일·스크린샷으로 키를 공유하지 마세요.
 - 이 서버는 내 컴퓨터(127.0.0.1)에서만 열려요. 외부에 공개하는 용도가 아니에요.
-- 클로드 코드에서 이어서 작업할 때는 이 폴더를 열고 "selectmarket-chat/README.md 읽고 이어서 해 줘"라고 요청하면 돼요.
+- 클로드 코드에서 이어서 작업할 때는 이 폴더를 열고 "README.md 읽고 이어서 해 줘"라고 요청하면 돼요.

@@ -21,7 +21,7 @@ AI 답변까지 배포하려면 Blaze 요금제 + Cloud Functions + 비밀값(Se
 
 ## 순서
 1. **Firebase 프로젝트 만들기** (콘솔 → 프로젝트 추가 → Google 애널리틱스는 꺼도 돼요)
-2. **웹 앱 등록**: 프로젝트 설정 → 내 앱 → 웹(`</>`). 나온 설정값을 `firebase-config.example.js`를 복사한 `firebase-config.js`에 붙여 넣기. (이 파일은 깃에 올라가지 않아요)
+2. **웹 앱 등록**: 프로젝트 설정 → 내 앱 → 웹(`</>`). 나온 설정값을 `web/firebase-config.example.js`를 복사한 `web/firebase-config.js`에 붙여 넣기. (이 파일은 깃에 올라가지 않아요)
 3. **Firestore 만들기**: 빌드 → Firestore Database → 만들기 (프로덕션 모드)
 4. **로그인 켜기**: 빌드 → Authentication → 시작하기 → 로그인 방법에서 **익명**과 **Google**을 사용 설정
 5. **관리자 등록**: Firestore에서 컬렉션 `admins`를 만들고, 문서 ID를 **내 구글 이메일**로 해서 필드 하나(예: `role` = `owner`)를 넣어요.

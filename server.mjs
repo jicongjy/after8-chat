@@ -58,7 +58,7 @@ const sameOrigin = req => {
 };
 
 async function page() {
-  const html = await readFile(path.join(HERE, "index.html"), "utf8");
+  const html = await readFile(path.join(HERE, "web", "index.html"), "utf8");
   // 파일로 만든 페이지는 글자 인코딩·모바일 폭 선언이 빠져 있어서 여기서 붙인다.
   return html.includes("<head>")
     ? html.replace("<head>", '<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">')

@@ -5,4 +5,4 @@ node_modules/
 .DS_Store
 data/
 public/
-firebase-config.js
+web/firebase-config.js
