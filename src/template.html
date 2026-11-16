@@ -377,6 +377,11 @@ const PAY = {
   fail: "결제가 실패했는데 금액이 빠져나갔다면 보통 자동으로 취소돼요. 며칠이 지나도 그대로면 고객센터로 문의해 주세요.",
   url: "https://after8.example/help/payment"
 };
+// 배송비 안내 (연습용으로 정한 값)
+const SHIP = { fee: 3000, free: 30000, ret: 3000 };
+const shipText = ret => ret
+  ? "단순 변심으로 교환·반품하면 반품 배송비 " + won(SHIP.ret) + "이 들어요. 상품에 문제가 있거나 잘못 배송된 경우는 배송비를 받지 않아요."
+  : "배송비는 " + won(SHIP.fee) + "이에요. " + won(SHIP.free) + " 이상 구매하면 무료예요. 결제 후 보통 2~3일 안에 도착해요.";
 // 평일 09:00~18:00 (한국 시간)인지 본다. 공휴일은 따지지 않는다.
 function openNow() {
   const p = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Seoul", weekday: "short", hour: "numeric", minute: "numeric", hour12: false }).formatToParts(new Date());
@@ -448,6 +453,8 @@ function quickAnswer(text) {
   if (/상담원|사람\s*연결|직원\s*연결/.test(text)) { pend = null; miss = 0; return { text: agentText(), follow: ["주문·배송 조회", "교환·환불"] }; }
   if (/^\s*(안녕[가-힣]*|하이|반가워[가-힣]*|hello|hi)[\s!.~]*$/i.test(text)) { pend = null; return { text: "안녕하세요! 주문·배송 조회, 재고 확인, 상품 찾기, 교환·환불 안내를 도와드려요.", follow: ["주문·배송 조회", "재고 확인", "상품 찾기"] }; }
   if (/^\s*(감사|고마워|고맙)[가-힣\s!.~]*$/.test(text)) { pend = null; return { text: "도움이 되었다니 다행이에요. 더 궁금한 건 편하게 물어보세요.", follow: ["주문·배송 조회", "상품 찾기"] }; }
+  // 배송비: 기간 질문("얼마나 걸려요")과 구분하고, 반품 배송비도 교환·환불 안내보다 먼저 가려 낸다
+  if (/배송비|배송료|택배비|무료\s*배송|배송\s*무료/.test(text)) { pend = null; return { text: shipText(/반품|교환|환불/.test(text)), follow: ["배송은 얼마나 걸려요?", "주문·배송 조회", "교환·환불"] }; }
   // 결제 안내: 이중 결제, 결제 실패, 영수증은 먼저 가려 낸다
   if (/(두\s*번|중복|이중).*결제|결제.*(두\s*번|중복|이중)/.test(text)) { pend = null; return { text: PAY.double + "\n" + supportLines(), follow: ["상담원 연결", "결제 방법 알려 주세요"] }; }
   if (/결제.*(실패|오류|에러|안\s*돼|안\s*됐|안됨)/.test(text)) { pend = null; return { text: PAY.fail + "\n" + supportLines(), follow: ["상담원 연결", "결제 방법 알려 주세요"] }; }
@@ -505,6 +512,7 @@ function storeText() {
   DATA.ships.forEach(x => L.push([x.no, x.carrier, x.track || "-", x.step, x.loc || "-", x.eta || "-"].join(" | ")));
   L.push("[클래스 비교] 클래스 | 요일 시간 | 가격 | 몸 쓰기 | 말 많이 | 비용 (1~3단계, 숫자가 클수록 더 많이 쓰고 더 들어요)");
   CLASSES.forEach(k => L.push([k.name, k.day + " " + k.time, k.price, k.body, k.talk, k.cost].join(" | ")));
+  L.push("[배송 안내] " + shipText(false) + " | " + shipText(true));
   L.push("[고객센터] 문의 경로 " + SUPPORT.path + " | 전화 " + SUPPORT.tel + " | 이메일 " + SUPPORT.mail + " | 운영 시간 " + SUPPORT.hours + " | 안내 페이지 " + SUPPORT.url);
   L.push("[결제 안내] 결제 수단: " + PAY.methods + " | 결제 흐름: " + PAY.flow + " | 영수증: " + PAY.receipt + " | 이중 결제: " + PAY.double + " | 결제 실패: " + PAY.fail + " | 안내 페이지 " + PAY.url);
   return L.join("\n");
